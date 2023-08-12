@@ -1,0 +1,105 @@
+<div class="row ">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">All Transactions</h4>
+          <div class="table-responsive">
+          <% if (transact.length > 0) { %>
+             
+            
+            <table class="table">
+              <thead>
+                <tr>
+                
+                  <th> Companies Acc</th>
+                  <th> Amount </th>
+                  <th> Item Bought/Sold </th>
+                  <th> Individual Acc </th>
+                  <th> Payment Gateway </th>
+                  <th> Type of Payment </th>
+                  <th> Date of Transact </th>
+                  <th> Time of Transact </th>
+                  <th> TransactionID </th>
+                  <th> Created </th>
+                  <th> Updated </th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+
+                <% transact.forEach(tran => { %>
+                 
+                <tr>
+                  
+                  <td>
+                    <img src="/assets/images/faces/face1.jpg" alt="image" />
+                    <span class="pl-2"><%= tran.companyAcc %></span>
+                  </td>
+                  <td>$<%= tran.Amount %> </td>
+                  <td> <%= tran.itemBoughtSold %></td>
+                  <td> <%= tran.IndividualAcc %></td>
+                  <td> <%= tran.paymentGateway %> </td>
+                  <td> <%= tran.Type %> </td>
+                  <td> <%= tran.dateofTransact %> </td>
+                  <td> <%= tran.timeofTransact %> </td>
+                  <td> <%= tran.TransactionId %> </td>
+                  <td> <%= tran.createAt %> </td>
+                  <% if (tran.updateAt) { %>
+                  <td> <%= tran.updateAt %></td>
+                  <% } else { %>
+                  <td> Nil</td>
+                  <% } %>
+                  <% if (current_user.admin == true) { %>
+                    <td> 
+                      <form action="/transactions-edit/<%= tran._id %>?_method=GET" method="POST">
+                        <input  type="submit" value="Edit" class="btn-delete btn">
+                      </form>
+                    </td>
+                    <td> 
+                      <form action="/transactions/delete/<%= tran._id %>?_method=DELETE" method="POST">
+                        <input type="submit" value="Delete" class="btn-delete btn">
+                      </form>
+                    </td>
+                  <% } %>
+
+
+                  
+                </tr>
+
+                <% }) %>
+
+              </tbody>
+             
+            </table>
+            <% } else { %>
+              <p>No page left</p>
+            <% } %>
+          </div>
+        </div>
+        <h4 class="card-title" style="padding: 8px 10px; margin-left: 20px;">
+          <% if (noOfPages > 1) { %>
+            <% if (hasPrevPage == true) { %>
+              <a href="/transactions/?page=<%= prevPage %>" style="padding: 0 4px; color: white;" >&lt; Prev</a>
+            <% } %>
+            <% for( let i = 0; i < noOfPages; i++ ) { %>
+              <% if (page == i +1) { %>
+                <a href="/transactions/?page=<%= i + 1 %>" style="padding: 0 4px; color: #3fafbc;" ><%= i + 1 %></a>  
+              <% } else { %>
+              <a href="/transactions/?page=<%= i + 1 %>" style="padding: 0 4px; color: white;" ><%= i + 1 %></a>
+              <% } %>
+            <% } %>
+            <% if (hasNextPage == true) { %>
+              <a href="/transactions/?page=<%= nextPage %>" style="padding: 0 4px; color: white;">Next &gt;</a>
+            <% } %>
+          <% } %>
+          
+        </h4>
+      </div>
+      
+    </div>
+  </div>
+  <% if (current_user.admin == true) { %>
+
+  <button type="submit" class="btn btn-primary mr-2"><a style="color: white; " href="/add-transact">Add a Recent Transaction</a> </button>
+  <% } %>
+

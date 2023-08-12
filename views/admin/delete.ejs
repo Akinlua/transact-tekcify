@@ -1,0 +1,14 @@
+
+
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Delete User</h4>
+        <p class="card-description" style="color: red;">YOU ARE ABOUT TO DELETE THIS ACCOUNT</p>
+        <form action="/delete-user/<%= user.id %>?_method=DELETE" method="POST" class="forms-sample">
+          <button type="submit" class="btn btn-primary mr-2" style="background-color: red;">Go Ahead</button>
+          <button class="btn btn-dark"><a href="/user-page" style="color: white;">Cancel</a> </button>
+        </form>
+      </div>
+    </div>
+  </div>

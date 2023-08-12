@@ -1,0 +1,28 @@
+<div class="col-md-12 grid-margin stretch-card">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">User Profile</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <address>
+            <p class="font-weight-bold">Username</p><br>
+            <p> Email </p><br>
+            <p> Company ID</p>
+          </address>
+        </div>
+        <div class="col-md-6">
+          <address class="text-primary">
+            <p class="font-weight-bold"><%= current_user.username %> </p><br>
+            <p class="mb-2"> <%= current_user.email %> </p><br>
+            <p class="font-weight-bold"><%= current_user.companyID %> </p>
+          </address>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h4 class="card-title"><a href="/edit-user/<%= current_user.id %>">Edit</a> <a href="/delete-user/<%= current_user.id %>" style="color: red;">Delete User</a> </h4>
+
+     
+    </div>
+  </div>
+</div>

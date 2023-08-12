@@ -1,0 +1,61 @@
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Add recent Transaction</h4>
+        <p class="card-description"> Add the full detailed of the transaction as instructed</p>
+        <form action="/add-transact" method="POST" class="forms-sample">
+          <div class="form-group">
+            <label for="companyAcc">Companies Account Name</label>
+            <select name="companyAcc" class="form-control" id="exampleSelectGender">
+              <option><%= ComapnyAccEnum.MAIN %></option>
+              <option><%= ComapnyAccEnum.payacc %></option>
+              <option><%= ComapnyAccEnum.porfolioacc %></option>
+              <option><%= ComapnyAccEnum.storeacc %></option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="itemBoughtSold">Item Bought / Sold</label>
+            <input type="text" class="form-control" id="exampleInputEmail3" placeholder="Item" name="itemBoughtSold" required>
+          </div>
+          <div class="form-group">
+            <label for="Amount">Amount</label>
+            <input type="number" class="form-control" id="exampleInputEmail3" placeholder="Amount transacted" name="Amount" required>
+          </div>
+          <div class="form-group">
+            <label for="IndividualAcc">Account sent to /Received from</label>
+            <input type="text" class="form-control" id="exampleInputPassword4" placeholder="Account name" name="IndividualAcc" required>
+          </div>
+          <div class="form-group">
+            <label for="paymentGateway">Payment Gateway</label>
+            <select name="paymentGateway" class="form-control" id="exampleSelectGender">
+              <option>Stripe</option>
+              <option>Paypal</option>
+              <option>Flutterwave</option>
+              <option>Paystack</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="Type">Type of Payment</label>
+            <select name="Type" class="form-control" id="exampleSelectGender">
+              <option>Income</option>
+              <option>Expenditure</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="dateofTransact">Date of Transaction</label>
+            <input type="date" class="form-control" id="exampleInputPassword4" placeholder="Date of transaction" name="dateofTransact" required>
+          </div>
+          <div class="form-group">
+            <label for="timeofTransact">Time of Transaction of Payment</label>
+            <input type="time" class="form-control" id="exampleInputPassword4" placeholder="Time of transaction" name="timeofTransact" required>
+          </div>
+          <div class="form-group">
+            <label for="TransactionId">Transaction ID</label>
+            <input type="text" class="form-control" id="exampleInputPassword4" placeholder="TransactionID" name="TransactionId" required>
+          </div>
+          <button type="submit" class="btn btn-primary mr-2">Submit</button>
+          <button class="btn btn-dark"><a href="/transactions" style="color: white;">Cancel</a></button>
+        </form>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,71 @@
+<div class="row ">
+    <div class="col-12 grid-margin">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">All Transactions</h4>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                
+                  <th> Companies Acc</th>
+                  <th> Amount </th>
+                  <th> Item Bought/Sold </th>
+                  <th> Individual Acc </th>
+                  <th> Payment Gateway </th>
+                  <th> Type of Payment </th>
+                  <th> Date of Transact </th>
+                  <th> Time of Transact </th>
+                  <th> TransactionID </th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+
+                <% transact.forEach(tran => { %>
+                 
+                <tr>
+                  
+                  <td>
+                    <img src="/assets/images/faces/face1.jpg" alt="image" />
+                    <span class="pl-2"><%= tran.companyAcc %></span>
+                  </td>
+                  <td> <%= tran.Amount %> </td>
+                  <td> <%= tran.itemBoughtSold %></td>
+                  <td> <%= tran.IndividualAcc %></td>
+                  <td> <%= tran.paymentGateway %> </td>
+                  <td> <%= tran.Type %> </td>
+                  <td> <%= tran.dateofTransact %> </td>
+                  <td> <%= tran.timeofTransact %> </td>
+                  <td> <%= tran.TransactionId %> </td>
+                   
+                  <% if (current_user.admin == true) { %>
+                  <td> 
+                    <form action="/transactions-edit/<%= tran._id %>?_method=GET" method="POST">
+                      <input  type="submit" value="Edit" class="btn-delete btn">
+                    </form>
+                  </td>
+                  <td> 
+                    <form action="/transactions/delete/<%= tran._id %>?_method=DELETE" method="POST">
+                      <input type="submit" value="Delete" class="btn-delete btn">
+                    </form>
+                  </td>
+                  <% } %>
+
+                  
+                </tr>
+
+                <% }) %>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <form action="/add-transact" method="POST" class="forms-sample"> -->
+    <button type="submit" class="btn btn-primary mr-2"><a href="/generate-pdf/<%= month %>" style="color: white;"> Download <%= month %> Transactions PDF</a></button>
+    <button type="submit" class="btn btn-primary mr-2"><a href="/generate-excel/<%= month %>" style="color: white;"> Download <%= month %> Transactions Excel</a></button>
+    
+  <!-- </form> -->

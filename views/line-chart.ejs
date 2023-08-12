@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+    <title>Line Chart Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</html>
+<body>
+
+    <% if (monthYear_arr.length > 0 || Total_Revenue_arr.length > 0) { %>
+     
+        <!-- CHart to compare how the revnue is going each month -->
+        <div style="width: 550px; height: 300px;">
+            <canvas id="lineChart" style="background-color: white;"></canvas>
+        </div>
+
+    
+        <!-- chart to check how each month is faring comapred to other months -->
+        <div style="width: 550px; height: 300px;">
+            <canvas id="lineChart2" style="background-color: white;"></canvas>
+        </div>
+
+        <!-- CHart to compare how the revnue is going each year -->
+        <div style="width: 550px; height: 300px;">
+            <canvas id="lineChart3" style="background-color: white;"></canvas>
+        </div>
+
+    
+        <!-- chart to check how each year is faring comapred to other months -->
+        <div style="width: 550px; height: 300px;">
+            <canvas id="lineChart4" style="background-color: white;"></canvas>
+        </div>
+    <% } %>
+
+    
+</body>
+
+<script>
+    var monthYear_arr = '<%= monthYear_arr%>'
+    var Total_Revenue_arr= '<%= Total_Revenue_arr %>' //total revenue at month time
+    var month_Revenue = '<%= month_Revenue %>'
+    var year_arr = `<%= year_arr %>`
+    var year_Revenue = `<%= year_Revenue %>`
+    var Total_Revenue_arr_Yr = `<%= Total_Revenue_arr_Yr %>` // totla revenue at year time
+ 
+    const labels = []
+    const data = []
+    const data2 = []
+
+    const labels_year= []
+    const data_yearR = []
+    const data_yearTR =[]
+
+
+    monthYear_arr = monthYear_arr.split(',')
+    monthYear_arr.forEach(mon => {
+        labels.push(mon)
+    });
+
+    Total_Revenue_arr = Total_Revenue_arr.split(',')
+    Total_Revenue_arr.forEach(rev => {
+        data.push(rev)
+    })
+
+    month_Revenue = month_Revenue.split(',')
+    month_Revenue.forEach(rev => {
+        data2.push(rev)
+    })
+
+    // for year chat
+    year_arr = year_arr.split(',')
+    year_arr.forEach(rev => {
+        labels_year.push(rev)
+    })
+
+    year_Revenue = year_Revenue.split(',')
+    year_Revenue.forEach(rev => {
+        data_yearR.push(rev)
+    })
+
+    Total_Revenue_arr_Yr = Total_Revenue_arr_Yr.split(',')
+    Total_Revenue_arr_Yr.forEach(rev => {
+        data_yearTR.push(rev)
+    })
+    
+
+    // first chafrrt comapre reveue and month revenue
+    new Chart(document.getElementById("lineChart"), {
+        type: 'line',
+        data: {
+            labels :labels,
+            datasets : [
+                {
+                    data: data,
+                    label: "How the Total Revenue has changed monthly",
+                    borderColor: "#3cba9f",
+                    borderWidth: 1,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Monthly Charts'
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Month and Year'
+                    },
+                    grid: {
+                        borderColor: "#3cba9f",
+                    }
+                },
+                y: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Revenue'
+                }
+            }
+            },
+            
+        }
+            
+
+        
+    })
+
+    //second chart
+    new Chart(document.getElementById("lineChart2"), {
+        type: 'line',
+        data: {
+            labels :labels,
+            datasets : [
+                {
+                    data: data2,
+                    label: "Comparism of the month based on their Revenues",
+                    borderColor: "#3cba9f",
+                    borderWidth: 1,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Monthly Charts'
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Month and Year'
+                    },
+                    grid: {
+                        borderColor: "#3cba9f",
+                    }
+                },
+                y: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Revenue'
+                }
+            }
+            },
+            
+        }
+            
+
+        
+    })
+
+    //third chart year revnue yearly
+    new Chart(document.getElementById("lineChart3"), {
+        type: 'line',
+        data: {
+            labels :labels_year,
+            datasets : [
+                {
+                    data: data_yearR,
+                    label: "Comparism of Each Year based on their Revenue (How each year has done)",
+                    borderColor: "#3cba9f",
+                    borderWidth: 1,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Yearly Charts'
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Year'
+                    },
+                    grid: {
+                        borderColor: "#3cba9f",
+                    }
+                },
+                y: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Revenue'
+                }
+            }
+            },
+            
+        }
+            
+
+        
+    })
+
+    //fourth chart year revnue yearly
+    new Chart(document.getElementById("lineChart4"), {
+        type: 'line',
+        data: {
+            labels :labels_year,
+            datasets : [
+                {
+                    data: data_yearTR,
+                    label: "How the Total Revenue has changed Yearly (The way the company is moving)",
+                    borderColor: "#3cba9f",
+                    borderWidth: 1,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Yearly Charts'
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Year'
+                    },
+                    grid: {
+                        borderColor: "#3cba9f",
+                    }
+                },
+                y: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Revenue'
+                }
+            }
+            },
+            
+        }
+            
+
+        
+    })
+
+</script>
+
+<!-- 
+// const labels = ['January', 'February', 'March', 'April', 'May']
+// const data = [10., 15, 8, 20, 12]
+
+// const ctx = document.getElementById('lineChart')
+// const lineChart = new Chart(ctx, {
+//     type: 'line',
+//     data: {
+//         label: labels,
+//         datasets: [{
+//             label: 'Dataset 1',
+//             data: data,
+//             borderColor: 'rgba(75, 192, 192, 1)',
+//             backgroundColor: 'rgba(75, 192, 192, 0.2)',
+//             fill:true
+//         }]
+//     },
+//     options: {
+//     responsive: false,//disable for simplicity
+//     scales: {
+//         x: {
+//             display: true,
+//             title: {
+//                 display: true,
+//                 text: 'X Axis Label'
+//             }
+//         }
+//     },
+//     y: {
+//         display: true,
+//         title: {
+//             display: true,
+//             text: 'Y Axis Label'
+//         }
+//     }
+// }
+    
+// }) -->
