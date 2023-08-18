@@ -1,2 +1,2 @@
 [phases.setup]
-nixPkgs = ["...", "util-linux"]
+aptpkgs = ["e2fsprogs"]
