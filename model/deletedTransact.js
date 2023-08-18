@@ -9,7 +9,7 @@ const ComapnyAccEnum = {
     MAIN:'MAIN'
 }
 
-const transactSchema = mongoose.Schema({
+const deletetransactSchema = mongoose.Schema({
     companyAcc:{
         type: String,
         enum: [ComapnyAccEnum.porfolioacc, ComapnyAccEnum.payacc, ComapnyAccEnum.storeacc, ComapnyAccEnum.MAIN],
@@ -96,7 +96,7 @@ const transactSchema = mongoose.Schema({
 
 
 module.exports ={
-    Transact: mongoose.model('Transact', transactSchema),
-    transactSchema: transactSchema,
+    DeletedTransact: mongoose.model('DeletedTransact', deletetransactSchema),
+    deletetransactSchema: deletetransactSchema,
     ComapnyAccEnum: ComapnyAccEnum,
 }

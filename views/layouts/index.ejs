@@ -20,15 +20,15 @@
     <!-- Layout styles -->
     <link rel="stylesheet" href="/assets/css/style.css">
     <!-- End layout styles -->
-    <link rel="shortcut icon"  href="/assets/images/favicon.png" />
+    <link rel="shortcut icon"  href="https://svgshare.com/i/wSF.svg" />
   </head>
   <body>
     <div class="container-scroller">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <a class="sidebar-brand brand-logo" href="/"><img src="https://svgshare.com/i/wSF.svg" alt="logo" /></a>
-          <a class="sidebar-brand brand-logo-mini" href="/"><img src="https://svgshare.com/i/wSF.svg" alt="logo" /></a>
+          <a class="sidebar-brand brand-logo" href="/"><img src="https://svgshare.com/i/wQ7.svg" style="height: 50px;" alt="logo" /></a>
+          <a class="sidebar-brand brand-logo-mini" href="/"><img src="https://svgshare.com/i/wQ7.svg" style="height: 50px;" alt="logo" /></a>
         </div>
         <ul class="nav">
           <li class="nav-item profile">
@@ -75,6 +75,17 @@
               <span class="menu-title">Transactions</span>
             </a>
           </li>
+          <% if (current_user.admin == true) { %>
+           
+            <li class="nav-item menu-items">
+              <a class="nav-link" href="/deleted-transactions">
+                <span class="menu-icon">
+                  <i class="mdi mdi-speedometer"></i>
+                </span>
+                <span class="menu-title">Deleted Transactions</span>
+              </a>
+            </li>
+            <% } %>
         </ul>
       </nav>
       <!-- partial -->
@@ -82,7 +93,7 @@
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar p-0 fixed-top d-flex flex-row">
           <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
-            <a class="navbar-brand brand-logo-mini" href="/index.html"><img src="/assets/images/logo-mini.svg" alt="logo" /></a>
+            <a class="navbar-brand brand-logo-mini" href="/index.html"><img src="https://svgshare.com/i/wSF.svg" alt="logo" /></a>
           </div>
           <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
             <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -90,7 +101,7 @@
             </button>
             <ul class="navbar-nav w-100">
               <li class="nav-item w-100">
-                <form action="/transactions" method="post" class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+                <form action="/transactions" method="post" class="nav-link mt-2 mt-md-0  d-lg-flex search">
                   <input type="text"  name="searchTerm" class="form-control" placeholder="Search Transactions">
                 </form>
               </li>
@@ -164,28 +175,6 @@
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
-            <div class="row">
-              <div class="col-12 grid-margin stretch-card">
-                <div class="card corona-gradient-card">
-                  <div class="card-body py-0 px-0 px-sm-3">
-                    <div class="row align-items-center">
-                      <div class="col-4 col-sm-3 col-xl-2">
-                        <img src="/assets/images/dashboard/Group126@2x.png" class="gradient-corona-img img-fluid" alt="">
-                      </div>
-                      <div class="col-5 col-sm-7 col-xl-8 p-0">
-                        <h4 class="mb-1 mb-sm-0">Want even more features?</h4>
-                        <p class="mb-0 font-weight-normal d-none d-sm-block">Check out our Pro version with 5 unique layouts!</p>
-                      </div>
-                      <div class="col-3 col-sm-2 col-xl-2 pl-0 text-center">
-                        <span>
-                          <a href="https://www.bootstrapdash.com/product/corona-admin-template/" target="_blank" class="btn btn-outline-light btn-rounded get-started-btn">Upgrade to PRO</a>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
            
 
             <!-- ADD OTHER PAGES -->
@@ -197,9 +186,7 @@
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © tekcify.com 2023</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>
-            </div>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © tekcify.com 2023</span>    </div>
           </footer>
           <!-- partial -->
         </div>

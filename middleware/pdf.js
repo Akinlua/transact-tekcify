@@ -1,6 +1,36 @@
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 
+const axios = require('axios');
+const SVGtoPDF = require('svg-to-pdfkit');
+
+
+
+
+function generateHeader(doc) {
+
+
+    const svgUrl = 'https://svgshare.com/i/wQ7.svg'; // Replace with the URL of your SVG image
+    axios.get(svgUrl)
+    .then(response => {
+        const svgData = response.data;
+
+        // Convert SVG data to PDF and embed it in the document
+        const pdfOptions =  { width: 50 }
+        SVGtoPDF(doc, svgData, 50, 45, pdfOptions) // Replace x, y, and pdfOptions with appropriate values
+        doc.fillColor('#444444')
+		.fontSize(20)
+		.text('ACME Inc.', 110, 57)
+		.fontSize(10)
+		.text('123 Main Street', 200, 65, { align: 'right' })
+		.text('New York, NY, 10025', 200, 80, { align: 'right' })
+		.moveDown();
+    })
+    .catch(error => {
+        console.error('Error fetching SVG:', error);
+    });
+
+}
 
 
 function generateTableRow(doc, y, c1, c2, c3, c4, c5, Bold) {
@@ -15,7 +45,7 @@ function generateTableRow(doc, y, c1, c2, c3, c4, c5, Bold) {
 
 function generateInvoiceTable(doc, items) {
 	let i,
-		invoiceTableTop = 50;
+		invoiceTableTop = 150;
     const position = invoiceTableTop;
     generateTableRow(
         doc,
@@ -98,6 +128,7 @@ function createPDF(items, path, req, res) {
     //Add content to the PDF
 	// generateHeader(doc); // Invoke `generateHeader` function.
 	// generateFooter(doc); // Invoke `generateFooter` function.
+    generateHeader(doc)
     generateInvoiceTable(doc, items)
     // outputStream = fs.createWriteStream(path)
 	// doc.pipe(outputStream);

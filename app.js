@@ -20,15 +20,22 @@ const path = require('path')
 const {Month} = require('./model/monthTransact')
 const noLayout = '../views/layouts/nothing.ejs'
 
+// //extra security packages
+// const helmet = require('helmet')
+// const cors = require('cors')
+// const xss = require('xss-clean')
+
 
 //CRON JOB
 var cron = require('node-cron')
-// cron.schedule('59 59 23 28-31 * *', createMonthlyRecords)
-// cron.schedule('59 59 31 12 *', createYearlyRecords)
+
+cron.schedule('59 59 23 28-31 * *', createMonthlyRecords)
+cron.schedule('59 59 23 31 12 *', createYearlyRecords)
 // cron.schedule('* * * * * *', createMonthlyRecords)
 // cron.schedule('0 0 * * *', createMonthlyRecords)
 // cron.schedule('* * * * *', reset_day)
 cron.schedule('59 59 23 * * *', reset_day)
+
 
 
 
@@ -60,6 +67,9 @@ app.use(session({
 
 }))
 
+// app.use(helmet())
+// app.use(cors())
+// app.use(xss())
 
 app.use(express.static('public'))
 app.use('', userRouter)

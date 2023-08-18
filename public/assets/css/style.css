@@ -20735,12 +20735,12 @@ div.tagsinput {
           margin-right: auto;
           margin-left: 1rem; }
       .sidebar .nav .nav-item.active > .nav-link {
-        background: #0f1015;
+        /* background: #0f1015; */
         position: relative; }
         .sidebar .nav .nav-item.active > .nav-link:before {
           content: "";
-          width: 3px;
-          height: 100%;
+          /* width: 3px;
+          height: 100%; */
           background: #0090e7;
           display: inline-block;
           position: absolute;

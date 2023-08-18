@@ -19,7 +19,7 @@ const path = require('path')
 const { Year } = require('../model/yearlyTransact')
 const pagination = require('../middleware/pagination')
 const {Notice} = require('../model/notification')
-
+const {DeletedTransact} = require('../model/deletedTransact')
 
 const dashboard = async (req, res) => {
     
@@ -31,6 +31,8 @@ const dashboard = async (req, res) => {
     let paypalTotalTransAmt = await paymentGatewayTotalTransact("Paypal")
     let paystackTotalTransAmt = await paymentGatewayTotalTransact("Paystack")
     let flutterTotalTransAmt = await paymentGatewayTotalTransact("Flutterwave")
+    let BankTransferAmt = await paymentGatewayTotalTransact("Bank Transfer")
+
 
     console.log(stripeTotalTransAmt, paypalTotalTransAmt, paystackTotalTransAmt, flutterTotalTransAmt)
     //calc sum of income, expense for alll transact and Revenue(profit)
@@ -103,11 +105,12 @@ const dashboard = async (req, res) => {
 
     //calculate incr/dec perc for year
     const prevyearRecord = await prevYearRecord()
-    console.log("Previous year record: " + prevyearRecord.year)
     //find the percentage increase or decrease - Yearly
     let PrevYearRecord = null
     let perIncrease_decYear = null
     if(prevyearRecord) {
+        
+        console.log("Previous year record: " + prevyearRecord.year)
         PrevYearRecord = prevyearRecord
         perIncrease_decYear  = await calcPercYear(prevyearRecord, Year, null, prevyearRecord.year)
     }
@@ -119,7 +122,7 @@ const dashboard = async (req, res) => {
         per_increase_decrease, PrevMonthRecord, per_month_inc_dec, current_user,monthYear_arr, 
         Total_Revenue_arr, month_Revenue,prevyearRecord, perIncrease_decYear,
         year_arr, year_Revenue, Total_Revenue_arr_Yr, stripeTotalTransAmt, paypalTotalTransAmt, paystackTotalTransAmt, 
-        flutterTotalTransAmt, hasNextPage, nextPage, prevPage, hasPrevPage, page, noOfPages, notifications})
+        flutterTotalTransAmt, hasNextPage, nextPage, prevPage, hasPrevPage, page, noOfPages, notifications, BankTransferAmt})
 }
 
 const getTransactions = async (req, res) => {
@@ -136,6 +139,7 @@ const getTransactions = async (req, res) => {
     let paypalTotalTransAmt = await paymentGatewayTotalTransact("Paypal")
     let paystackTotalTransAmt = await paymentGatewayTotalTransact("Paystack")
     let flutterTotalTransAmt = await paymentGatewayTotalTransact("Flutterwave")
+    let BankTransferAmt = await paymentGatewayTotalTransact("Bank Transfer")
 
     //calc sum of income, expense for alll transact and Revenue(profit)
     let sum_income = await Income("forall")
@@ -188,7 +192,7 @@ const getTransactions = async (req, res) => {
     res.render('transact', {layout: dasboardLayout, transact, AllRecords, per_increase_decrease, 
         current_user, monthYear_arr, Total_Revenue_arr, 
         hasNextPage, nextPage, prevPage, hasPrevPage, page, noOfPages, stripeTotalTransAmt, paypalTotalTransAmt, paystackTotalTransAmt, 
-        flutterTotalTransAmt, notifications})
+        flutterTotalTransAmt, BankTransferAmt, notifications})
 }
 
 const changeToInt = async (value, req, res) => {
@@ -207,6 +211,7 @@ const transactSearch = async (req, res) => {
     let paypalTotalTransAmt = await paymentGatewayTotalTransact("Paypal")
     let paystackTotalTransAmt = await paymentGatewayTotalTransact("Paystack")
     let flutterTotalTransAmt = await paymentGatewayTotalTransact("Flutterwave")
+    let BankTransferAmt = await paymentGatewayTotalTransact("Bank Transfer")
 
     let  searchTerm = ""
     if (req.body.searchTerm )
@@ -214,6 +219,7 @@ const transactSearch = async (req, res) => {
     if(req.query.searchTerm)
         searchTerm = req.query.searchTerm
 
+    searchTerm = searchTerm.trim()
     // set the search value to be used for amount
     let searchValue = await changeToInt(searchTerm)
     console.log('search: ' + searchValue)
@@ -311,7 +317,7 @@ const transactSearch = async (req, res) => {
         per_increase_decrease, current_user, monthYear_arr, 
         Total_Revenue_arr,hasNextPage, nextPage, prevPage, hasPrevPage, page, noOfPages, page_,
         stripeTotalTransAmt, paypalTotalTransAmt, paystackTotalTransAmt, 
-        flutterTotalTransAmt, notifications,
+        flutterTotalTransAmt, BankTransferAmt, notifications,
     })
 
 
@@ -376,59 +382,87 @@ const getYesterdaydate = () => {
 
 const createTransactions = async (req, res) => {
 
-    const checkTransactID = await Transact.findOne({TransactionId: req.body.TransactionId})
-    if(!checkTransactID){
-
-        //check if date and time are correctly inputted
-        let checkdate = await checkDate(req.body.dateofTransact, req,res)
-        if (checkdate == false){
-            return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Error, check date input"})
+    try {
+        let current_user = null
+        const currentUser = await User.findById(req.userId)
+        if (currentUser) {
+            current_user = currentUser
         }
-        let checktime = await checkTime(req.body.timeofTransact, req, res)
+        const notifications = await Notice.find({}).sort("-createdAt").limit(3)
+        ////////////////////////////
+        const checkTransactID = await Transact.findOne({TransactionId: req.body.TransactionId})
+        if(!checkTransactID){
 
-        if (checktime == false){
-            return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Error, check time input"})
+            //check if date and time are correctly inputted
+            let checkdate = await checkDate(req.body.dateofTransact, req,res)
+            if (checkdate == false){
+                let error_ = "Error, check date input"
+                return res.render('add-transact', {ComapnyAccEnum, current_user, notifications, error_})
+                // return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Error, check date input"})
+            }
+            let checktime = await checkTime(req.body.timeofTransact, req, res)
+
+            if (checktime == false){
+                let error_ = "Error, check time input"
+                return res.render('add-transact', {ComapnyAccEnum, current_user, notifications, error_})
+                // return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Error, check time input"})
+            }
+            //end
+
+            const transact = await Transact.create({...req.body})
+            let create_ID = transact._id
+
+            const newTransact = await createDate(transact, Transact)
+
+            // find the just created transact with the stored ID
+            const transact_ = await Transact.findOne({_id: create_ID})
+            console.log(transact_)
+            
+            
+            updateMonthlyRecords(transact.month_year, req, res)//update month with initial month date
+            updateMonthlyRecords(newTransact.month_year, req, res)// /update month with new month date 
+            
+            // get the initial year of transact
+            if ( transact.month_year) {
+                let iniyear = transact.month_year
+                iniyear = iniyear.split(" ")
+                iniyear = iniyear[1]
+            }
+
+            //get the year of the transact updated 
+            let year = newTransact.month_year 
+            console.log(year, typeof year)
+            year = year.split(" ")
+            year = year[1]
+
+            if ( transact.month_year) {
+                updateYearlyRecords(iniyear, req, res)//only update if there was initial transact with a mont-year
+            }
+            updateYearlyRecords(year, req, res)
+
+
+            res.redirect('/transactions')
+
         }
-        //end
-
-        const transact = await Transact.create({...req.body})
-        let create_ID = transact._id
-
-        const newTransact = await createDate(transact, Transact)
-
-        // find the just created transact with the stored ID
-        const transact_ = await Transact.findOne({_id: create_ID})
-        console.log(transact_)
-        
-        
-        updateMonthlyRecords(transact.month_year, req, res)//update month with initial month date
-        updateMonthlyRecords(newTransact.month_year, req, res)// /update month with new month date 
-        
-        // get the initial year of transact
-        if ( transact.month_year) {
-            let iniyear = transact.month_year
-            iniyear = iniyear.split(" ")
-            iniyear = iniyear[1]
+        else {
+            let error_ = "Make sure Transaction ID is unique"
+            return res.render('add-transact', {ComapnyAccEnum, current_user, notifications, error_})
+            // return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Make sure Transaction ID is unique"})
         }
 
-        //get the year of the transact updated 
-        let year = newTransact.month_year 
-        console.log(year, typeof year)
-        year = year.split(" ")
-        year = year[1]
-
-        if ( transact.month_year) {
-            updateYearlyRecords(iniyear, req, res)//only update if there was initial transact with a mont-year
+    } catch(error) {
+        let current_user = null
+        const currentUser = await User.findById(req.userId)
+        if (currentUser) {
+            current_user = currentUser
         }
-        updateYearlyRecords(year, req, res)
+        const notifications = await Notice.find({}).sort("-createdAt").limit(3)
 
-
-        res.redirect('/transactions')
-
+        let error_ = "Make sure that all fields are filled correctly"
+        return res.render('add-transact', {ComapnyAccEnum, current_user, notifications, error_})
     }
-    else {
-        return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Make sure Transaction ID is unique"})
-    }
+
+    
 
 }
 const transactPage = async (req,res) => {
@@ -439,7 +473,8 @@ const transactPage = async (req,res) => {
     }
     const notifications = await Notice.find({}).sort("-createdAt").limit(3)
 
-    res.render('add-transact', {ComapnyAccEnum, current_user, notifications})
+    let error_ =''
+    res.render('add-transact', {ComapnyAccEnum, current_user, notifications, error_})
 }
 
 
@@ -457,10 +492,82 @@ const deleteTransactions = async (req, res) => {
     year = year[1]
     console.log("year: " + year)
     await updateYearlyRecords(year, req, res)
-    
+
+    // add to the deleted transaction model
+    const deletedTransact = new DeletedTransact({
+        companyAcc: transact.companyAcc,
+        IndividualAcc: transact.IndividualAcc,
+        itemBoughtSold: transact.itemBoughtSold,
+        Amount: transact.Amount,
+        dateofTransact: transact.dateofTransact,
+        timeofTransact: transact.timeofTransact,
+        paymentGateway: transact.paymentGateway,
+        TransactionId: transact.TransactionId,
+        Type: transact.Type,
+        month_year: transact.month_year,
+        updateAt: transact.updateAt,
+        createAt: transact.createAt,
+    });
+    const deletedtransact = await DeletedTransact.create(deletedTransact)
+
+    //set timeout for permanetly deletion
+    const deletionTimeout = 864000000
+    setTimeout( async () => {
+        await DeletedTransact.findByIdAndDelete(newdeletetransact._id)
+    }, deletionTimeout)
+
     res.redirect('/transactions')
 }
 
+const undoDelete = async (req, res) => {
+
+    // delete from deletedTransact
+
+    const transact = await DeletedTransact.findOne({ _id: req.params.id } )
+    await DeletedTransact.deleteOne( { _id: req.params.id } ); 
+
+    // add to the deleted transaction model
+    const newtransact = new Transact({
+        companyAcc: transact.companyAcc,
+        IndividualAcc: transact.IndividualAcc,
+        itemBoughtSold: transact.itemBoughtSold,
+        Amount: transact.Amount,
+        dateofTransact: transact.dateofTransact,
+        timeofTransact: transact.timeofTransact,
+        paymentGateway: transact.paymentGateway,
+        TransactionId: transact.TransactionId,
+        Type: transact.Type,
+        month_year: transact.month_year,
+        updateAt: transact.updateAt,
+        createAt: transact.createAt,
+    });
+    const transact_ = await Transact.create(newtransact)
+
+    updateMonthlyRecords(newtransact.month_year, req, res)//update month with initial month date
+    //get the year of the transact updated 
+    let year = newtransact.month_year 
+    year = year.split(" ")
+    year = year[1] 
+    updateYearlyRecords(year, req, res) 
+
+    res.redirect(`/deleted-transactions`)
+}
+
+const deletedTransactionPage = async (req, res) => {
+
+    let deletedtransact = DeletedTransact.find({}).sort("-createAt")
+    deletedtransact = await deletedtransact
+
+    let current_user = null
+    const currentUser = await User.findById(req.userId)
+    console.log(currentUser)
+    if (currentUser) {
+        current_user = currentUser
+    }
+
+    const notifications = await Notice.find({}).sort("-createdAt").limit(3)
+    res.render('deletedTransact', { deletedtransact, current_user, notifications}) 
+}
 const changeTransactionsPage = async (req, res) => {
 
 
@@ -476,50 +583,80 @@ const changeTransactionsPage = async (req, res) => {
     }
     const notifications = await Notice.find({}).sort("-createdAt").limit(3)
 
-
-    res.render('edit-transact', {transact, layout: transactLayout, ComapnyAccEnum, current_user, notifications})
+    let error_ = ""
+    res.render('edit-transact', {transact, layout: transactLayout, ComapnyAccEnum, current_user, notifications, error_})
 }
 const editTransactions = async (req,res) => {
 
-    //check if date and time are correctly inputted
-    let checkdate = await checkDate(req.body.dateofTransact, req,res)
-    if (checkdate == false){
-        return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Error, check date input"})
+    try {
+        /////////////////
+        let current_user = null
+        const currentUser = await User.findById(req.userId)
+        if (currentUser) {
+            current_user = currentUser
+        }
+        const notifications = await Notice.find({}).sort("-createdAt").limit(3)
+        //////////////
+
+        //check if date and time are correctly inputted
+        let checkdate = await checkDate(req.body.dateofTransact, req,res)
+        if (checkdate == false){
+            let error_ = "Error, check date input"
+            return res.render('edit-transact', {transact, layout: transactLayout, ComapnyAccEnum, current_user, notifications, error_})
+        }
+        let checktime = await checkTime(req.body.timeofTransact, req, res)
+
+        if (checktime == false){
+            let error_ = "Error, check time input"
+            return res.render('edit-transact', {transact, layout: transactLayout, ComapnyAccEnum, current_user, notifications, error_})
+        }
+        //end
+        const presentTransact =  await Transact.findOne({_id: req.params.id})
+
+        const transact = await Transact.findOneAndUpdate({_id: req.params.id}, req.body, {new: true, runValidators:true})
+        if (!transact) {
+            return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Bad request, wrong ID'"})
+        }
+        const newTransact = await updateDate(req.params.id, transact, Transact, res, req)
+
+        await updateMonthlyRecords(transact.month_year, req, res)//update month with initial month date
+        await updateMonthlyRecords(newTransact.month_year, req, res)//update month with new month date 
+        // get the initial year of transact
+        let iniyear = transact.month_year
+        iniyear = iniyear.split(" ")
+        iniyear = iniyear[1]
+
+        //get the year of the transact updated 
+        let year = newTransact.month_year
+        year = year.split(" ")
+        year = year[1]
+        
+        console.log("year: " + year)
+        await updateYearlyRecords(iniyear, req, res)//only update if there was initial transact with a mont-year
+
+        await updateYearlyRecords(year, req, res)
+
+
+        res.redirect(`/transactions`);
+    } catch(error) {
+        //////////////////
+        const transact = await Transact.findOne({_id: req.params.id })
+        if (!transact) {
+            return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Bad request, wrong ID'"})
+        }
+
+        let current_user = null
+        const currentUser = await User.findById(req.userId)
+        if (currentUser) {
+            current_user = currentUser
+        }
+        const notifications = await Notice.find({}).sort("-createdAt").limit(3)
+        //////////////////
+
+        let error_ = "Make sure that all fields are filled correctly or check if ID is unique"
+        return res.render('edit-transact', {transact, layout: transactLayout, ComapnyAccEnum, current_user, notifications, error_})
     }
-    let checktime = await checkTime(req.body.timeofTransact, req, res)
-
-    if (checktime == false){
-        return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Error, check time input"})
-    }
-    //end
-    const presentTransact =  await Transact.findOne({_id: req.params.id})
-
-    const transact = await Transact.findOneAndUpdate({_id: req.params.id}, req.body, {new: true, runValidators:true})
-    if (!transact) {
-        return res.render("errors/error-500", {layout: noLayout, name: "Bad Request",statusCode: 400, message: "Bad request, wrong ID'"})
-    }
-    const newTransact = await updateDate(req.params.id, transact, Transact, res, req)
-
-
-    await updateMonthlyRecords(transact.month_year, req, res)//update month with initial month date
-    await updateMonthlyRecords(newTransact.month_year, req, res)//update month with new month date 
-    // get the initial year of transact
-    let iniyear = transact.month_year
-    iniyear = iniyear.split(" ")
-    iniyear = iniyear[1]
-
-    //get the year of the transact updated 
-    let year = newTransact.month_year
-    year = year.split(" ")
-    year = year[1]
     
-    console.log("year: " + year)
-    await updateYearlyRecords(iniyear, req, res)//only update if there was initial transact with a mont-year
-
-    await updateYearlyRecords(year, req, res)
-
-
-    res.redirect(`/transactions`);
 }
 
 //generate pdf for each month
@@ -575,4 +712,6 @@ module.exports = {
     genereatePdf,
     genereateExcel,
     transactSearch,
+    deletedTransactionPage,
+    undoDelete,
 }

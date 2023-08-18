@@ -90,7 +90,7 @@ $(function() {
   
   var doughnutPieData = {
     datasets: [{
-      data: [stripeTotalTransAmt, paypalTotalTransAmt, flutterTotalTransAmt, paystackTotalTransAmt],//total amount transacted for each payment gateway (4 data)
+      data: [stripeTotalTransAmt, paypalTotalTransAmt, flutterTotalTransAmt, paystackTotalTransAmt, BankTransferAmt],//total amount transacted for each payment gateway (4 data)
       backgroundColor: [
         'rgba(255, 99, 132, 0.5)',
         'rgba(54, 162, 235, 0.5)',
@@ -111,7 +111,7 @@ $(function() {
  
     // These labels appear in the legend and in the tooltips when hovering different arcs
     labels: [
-      'Stripe', 'Paypal', 'Flutterwave', 'Paystack'
+      'Stripe', 'Paypal', 'Flutterwave', 'Paystack', 'Bank Transfer'
     ]
   };
   var doughnutPieOptions = {

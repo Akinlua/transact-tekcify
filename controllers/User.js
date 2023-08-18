@@ -29,7 +29,7 @@ const postRegister = async (req,res) => {
 
     try {
         // create dummy companyID array
-        let company_id = ["2222", "3333", "4444", "5555", "6666"]
+        let company_id = ["2222", "3333", "4444", "5555", "6666", "7777", "8888", "9999", "1010", "1111", "1110", "2110", "1100", "1000", "0000", "1001", "1011", "2220", "2200", "2020"]
         const {username, password, companyID, email} = req.body
         const hashedPassword = await bcrypt.hash(password, 10)
         let error = ""
@@ -207,7 +207,7 @@ const editUserPage = async (req, res) => {
 }
 const editUser = async (req, res) => {
     const {username, email, companyID} = req.body
-    let company_id = ["2222", "3333", "4444", '5555']
+    let company_id = ["2222", "3333", "4444", '5555', "6666", "7777", "8888", "9999", "1010", "1111", "1110", "2110", "1100", "1000", "0000", "1001", "1011", "2220", "2200", "2020"]
     if (req.userId !== req.params.id) {
         return res.render("errors/error-500", {layout: noLayout, name: "Unauthorized",statusCode: 401, message: "You cannot perform any action, you are unauthorized"})
     }

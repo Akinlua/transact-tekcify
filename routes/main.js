@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { dashboard, getTransactions, deleteTransactions, editTransactions, transactPage, createTransactions,changeTransactionsPage, getMonthlyTransactions, genereatePdf,
-    genereateExcel, transactSearch} = require('../controllers/transact')
+    genereateExcel, transactSearch, deletedTransactionPage, undoDelete} = require('../controllers/transact')
 const {authMiddleware, authAdmin} = require('../middleware/authentication.js')
 
 router.route('/').get(dashboard)
@@ -19,4 +19,8 @@ router.get('/monthly-transactions/:month', getMonthlyTransactions)
 router.get('/generate-pdf/:month', genereatePdf)
 router.get('/generate-excel/:month', genereateExcel)
 router.post('/transactions', transactSearch)
+
+// deleted transaction route page
+router.get('/deleted-transactions', authAdmin, deletedTransactionPage)
+router.post('/transactions-undo/:id', undoDelete)
 module.exports = router
