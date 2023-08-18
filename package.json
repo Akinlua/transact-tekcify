@@ -45,7 +45,4 @@
     "xss-clean": "^0.1.4",
     "yamljs": "^0.3.0"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
-  }
 }
