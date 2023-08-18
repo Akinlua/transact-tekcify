@@ -1,2 +1,2 @@
 [phases.setup]
-aptPkgs = ["...", "libuuid"]
+nixPkgs = ["...", "libuuid"]
