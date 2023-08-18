@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+<<<<<<< HEAD
     "start": "node app.js",
     "dev": "nodemon app.js"
+=======
+    "start": "node app.js"
+>>>>>>> 55bd46e7f8519eeb4e9293f80f927d4882ca90cc
   },
   "keywords": [],
   "author": "",
@@ -45,8 +49,5 @@
     "svg-to-pdfkit": "^0.1.8",
     "xss-clean": "^0.1.4",
     "yamljs": "^0.3.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
   }
 }
