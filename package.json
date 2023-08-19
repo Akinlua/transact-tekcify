@@ -47,5 +47,8 @@
     "svg-to-pdfkit": "^0.1.8",
     "xss-clean": "^0.1.4",
     "yamljs": "^0.3.0"
+  },
+  "optionalDependencies": {
+    "node-canvas": "*"
   }
 }
