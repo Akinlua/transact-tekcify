@@ -9,11 +9,9 @@ const {Notice} = require('../model/notification')
 
 
 const createMonthlyRecords = async (req, res) => {
-    console.log('start')
     monthUpdated = ""
     let mostAppearedComp = await appearedMostPerMonth("companyAcc","Income", "Expenditure",monthUpdated, req, res)
     let mostItemBoughSold = await appearedMostPerMonth("itemBoughtSold","Income", "Expenditure",monthUpdated, req, res)
-    console.log(mostAppearedComp)
     let mostAppearedGateWay = await appearedMostPerMonth("paymentGateway", "Income", "Expenditure",monthUpdated, req, res)
     let mostIndivTo = await appearedMostPerMonth("IndividualAcc","Expenditure", "Expenditure", monthUpdated, req, res)
     let mostIndivfrom = await appearedMostPerMonth("IndividualAcc","Income", "Income", monthUpdated, req, res)
@@ -27,7 +25,6 @@ const createMonthlyRecords = async (req, res) => {
     let expense_monthly = await Expense("Monthly", currentMonth_year)
     let revenue_monthly = income_monthly - expense_monthly
 
-    console.log(income_monthly)
     //find total revenue  at
     let sum_income = await Income("forall")
     let sum_expens = await  Expense("forall")
@@ -44,7 +41,6 @@ const createMonthlyRecords = async (req, res) => {
 
     const prev_month_year = previousMonth.substring(0,3) + " " + year
     // end get
-    console.log(prev_month_year)
 
     //find the prev month's object
     const prev_month_transact = await Month.findOne({month: prev_month_year}) 
@@ -61,7 +57,6 @@ const createMonthlyRecords = async (req, res) => {
     }
 
     let year_ = await new Date().getFullYear()
-    console.log("check before: " + mostAppearedComp.value)
     const monthTransact = new Month({
         Most_companyAcc: mostAppearedComp.value,
         Most_ItemBoughtSold: mostItemBoughSold.value,
@@ -80,7 +75,6 @@ const createMonthlyRecords = async (req, res) => {
        });
 
     const month_transact = await Month.create(monthTransact)
-    console.log(month_transact)
 
     // newly added
     const notification = new Notice({message: `The month Overwiew for ${monthTransact.month} has just been added`})
@@ -91,12 +85,9 @@ const createMonthlyRecords = async (req, res) => {
 } 
 const updateMonthlyRecords = async (monthUpdated, req, res) => {
     const monthRecords_ = await Month.findOne({month: monthUpdated})
-    console.log("monthRecords_: " + monthRecords_)
     if (!monthRecords_) {
         return
     }
-        console.log('start')
-        console.log("MonthUpdatedOne: " + monthUpdated)
         let mostAppearedComp = await appearedMostPerMonth("companyAcc","Income", "Expenditure", monthUpdated, req, res)
         let mostItemBoughSold = await appearedMostPerMonth("itemBoughtSold","Income", "Expenditure",monthUpdated, req, res)
         let mostAppearedGateWay = await appearedMostPerMonth("paymentGateway", "Income", "Expenditure", monthUpdated, req, res)
@@ -139,7 +130,6 @@ const updateMonthlyRecords = async (monthUpdated, req, res) => {
         const currentMonthDate = nextMonthDate.toLocaleString('default', {month: 'long'})
         
         const next_month_year = currentMonthDate.substring(0,3) + " " + nextMonthYear
-        console.log(next_month_year)
         //find the prev month's object
         const next_month_transact = await Month.findOne({month: next_month_year}) 
         //end find
@@ -153,18 +143,16 @@ const updateMonthlyRecords = async (monthUpdated, req, res) => {
         }
     
 
-    console.log("Uodated Monthly Review Is Ready")
+    console.log("Updated Monthly Review Is Ready")
 
 } 
 
 const reset_day = async () =>  {
-    console.log('start')
     const records = await Records.findOneAndUpdate({ID: "daily"}, {}, {upsert: true, new: true, runValidators: true})//get the records
     //set previous day to daily income
     const AllRecords = await Records.findOneAndUpdate({ID: "daily"}, {previous_Income: records.income, previous_Expense: records.expense, previous_Revenue: records.revenue}, {upsert: true, new: true, runValidators: true})
     //reset the day, set daily income to 0
     await Records.findOneAndUpdate({ID: "daily"}, {income: 0, expense: 0, revenue: 0}, {upsert: true, new: true, runValidators: true})   
-    console.log('end')
     
 }
 
@@ -194,8 +182,6 @@ const lineChart = async (req, res) => {
         year_Revenue.push(tran.revenue)
         Total_Revenue_arr_Yr.push(tran.Total_Revenue)
     })
-    console.log("Check Them: ", monthYear_arr, Total_Revenue_arr, month_Revenue)
-
 
     //also get for month revenue to another month revenue
 
@@ -206,7 +192,6 @@ const lineChart = async (req, res) => {
 
 
 const createYearlyRecords = async (req, res) => {
-    console.log('start')
 
     // Find all the revenue in the year
     // set it to the year records
@@ -217,7 +202,6 @@ const createYearlyRecords = async (req, res) => {
     let income_yearly = await Income("Yearly", thisyear)
     let expense_yearly = await Expense("Yearly", thisyear)
     let revenue_yearly = income_yearly - expense_yearly
-    console.log("Revenue:" + revenue_yearly, income_yearly, expense_yearly)
 
 
     //find total revenue  at
@@ -229,11 +213,9 @@ const createYearlyRecords = async (req, res) => {
     const currentDate = new Date()
     let year = currentDate.getFullYear()
     const prev_year = year - 1
-    console.log("YEAR: " + year)
 
     
     // end get
-    console.log("Prev Year: " + prev_year)
 
     //find the prev month's object
     const prev_year_transact = await Year.findOne({year: prev_year}) 
@@ -275,14 +257,10 @@ const updateYearlyRecords = async (yearUpdated, req, res) => {
     }
 
     if (yearRecords_) {
-        console.log('start')
-        console.log("YearUpdatedOne: " + yearUpdated)
 
         let income_yearly = await Income("Yearly", yearUpdated)
         let expense_yearly = await Expense("Yearly", yearUpdated)
         let revenue_yearly = income_yearly - expense_yearly
-        console.log("Todays year: " + yearUpdated)
-        console.log("Yearly Inocme: " + income_yearly)
    
         //find total revenue  at
         let sum_income = await Income("forall")

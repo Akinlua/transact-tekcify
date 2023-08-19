@@ -3,32 +3,25 @@ const PDFDocument = require('pdfkit');
 
 const axios = require('axios');
 const SVGtoPDF = require('svg-to-pdfkit');
+const path = require('path')
 
 
 
+function generateHeader(doc, month) {
 
-function generateHeader(doc) {
 
-
-    const svgUrl = 'https://svgshare.com/i/wQ7.svg'; // Replace with the URL of your SVG image
-    axios.get(svgUrl)
-    .then(response => {
-        const svgData = response.data;
-
-        // Convert SVG data to PDF and embed it in the document
-        const pdfOptions =  { width: 50 }
-        SVGtoPDF(doc, svgData, 50, 45, pdfOptions) // Replace x, y, and pdfOptions with appropriate values
-        doc.fillColor('#444444')
-		.fontSize(20)
-		.text('ACME Inc.', 110, 57)
-		.fontSize(10)
-		.text('123 Main Street', 200, 65, { align: 'right' })
-		.text('New York, NY, 10025', 200, 80, { align: 'right' })
-		.moveDown();
-    })
-    .catch(error => {
-        console.error('Error fetching SVG:', error);
-    });
+    const imagePath = path.join(__dirname, 'tekcify.png')
+    doc.image(imagePath, 50, 45, { width: 50 }) // Replace x, y, and pdfOptions with appropriate values
+    .fillColor('#444444')
+    .fontSize(20)
+    .text('Tekcify.', 110, 57)
+    .fontSize(10)
+    .fillColor('blue')
+    .text('transactions.tekcify.com', 200, 80, { link: 'https://transactions.tekcify.com', align: 'right' })
+    .fillColor('#444444') 
+    .fontSize(10)
+    .text(`${month} List of transactions`, 200, 65, { align: 'right' })
+    .moveDown();
 
 }
 
@@ -45,7 +38,7 @@ function generateTableRow(doc, y, c1, c2, c3, c4, c5, Bold) {
 
 function generateInvoiceTable(doc, items) {
 	let i,
-		invoiceTableTop = 150;
+		invoiceTableTop = 180;
     const position = invoiceTableTop;
     generateTableRow(
         doc,
@@ -95,7 +88,7 @@ function generateInvoiceTable(doc, items) {
         "Date of Transact",
         "Time of Transact",
         "Transaction ID",
-        "Item Bought/ Sold",
+        "Most Item Bought/ Sold",
         "Created",
         true,
     );
@@ -117,18 +110,19 @@ function generateInvoiceTable(doc, items) {
 
 }
 
-function createPDF(items, path, req, res) {
+function createPDF(items, path, month, req, res) {
     //create new PDF
 	let doc = new PDFDocument({ margin: 50 });
 
     //pipe the PDF to the response stream
-    res.setHeader('Content-Disposition', 'attachment; filename="transactions.pdf"')
+    const filename = `${month}_transactions.pdf`
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}`)
     doc.pipe(res)
     
     //Add content to the PDF
 	// generateHeader(doc); // Invoke `generateHeader` function.
 	// generateFooter(doc); // Invoke `generateFooter` function.
-    generateHeader(doc)
+    generateHeader(doc, month)
     generateInvoiceTable(doc, items)
     // outputStream = fs.createWriteStream(path)
 	// doc.pipe(outputStream);
@@ -136,7 +130,6 @@ function createPDF(items, path, req, res) {
     //finalize the PDF
 	doc.end();
 
-    console.log('check')
 
     
 }

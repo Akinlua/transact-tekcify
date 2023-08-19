@@ -22,5 +22,5 @@ router.post('/transactions', transactSearch)
 
 // deleted transaction route page
 router.get('/deleted-transactions', authAdmin, deletedTransactionPage)
-router.post('/transactions-undo/:id', undoDelete)
+router.post('/transactions-undo/:id', authAdmin, undoDelete)
 module.exports = router

@@ -33,8 +33,6 @@ const dashboard = async (req, res) => {
     let flutterTotalTransAmt = await paymentGatewayTotalTransact("Flutterwave")
     let BankTransferAmt = await paymentGatewayTotalTransact("Bank Transfer")
 
-
-    console.log(stripeTotalTransAmt, paypalTotalTransAmt, paystackTotalTransAmt, flutterTotalTransAmt)
     //calc sum of income, expense for alll transact and Revenue(profit)
     let sum_income = await Income("forall")
     let sum_expens = await  Expense("forall")
@@ -94,7 +92,6 @@ const dashboard = async (req, res) => {
     //find current User, if login
     let current_user = null
     const currentUser = await User.findById(req.userId)
-    // console.log(currentUser)
     if (currentUser) {
         current_user = currentUser
     }
@@ -109,8 +106,6 @@ const dashboard = async (req, res) => {
     let PrevYearRecord = null
     let perIncrease_decYear = null
     if(prevyearRecord) {
-        
-        console.log("Previous year record: " + prevyearRecord.year)
         PrevYearRecord = prevyearRecord
         perIncrease_decYear  = await calcPercYear(prevyearRecord, Year, null, prevyearRecord.year)
     }
@@ -150,14 +145,12 @@ const getTransactions = async (req, res) => {
     let sum_incomeDaily = await Income("Day")
     let sum_expensDaily  = await  Expense("Day")
     let RevenueDaily  = sum_incomeDaily-sum_expensDaily
-    console.log(sum_incomeDaily)
 
     // calc sum of prev day income
     let sum_incomePrevDaily = await Income("Prev")
     const newLocal = "Prev"
     let sum_expensPrevDaily  = await Expense(newLocal)
     let RevenuePrevDaily  = sum_incomePrevDaily-sum_expensPrevDaily
-    console.log("Sum prev: " + sum_expensPrevDaily) 
     //find All records
     let AllRecords = await Records.findOneAndUpdate({ID: "daily"}, {
         Total_Income:  sum_income,
@@ -179,7 +172,6 @@ const getTransactions = async (req, res) => {
     //find current User, if login
     let current_user = null
     const currentUser = await User.findById(req.userId)
-    console.log(currentUser)
     if (currentUser) {
         current_user = currentUser
     }
@@ -192,7 +184,7 @@ const getTransactions = async (req, res) => {
     res.render('transact', {layout: dasboardLayout, transact, AllRecords, per_increase_decrease, 
         current_user, monthYear_arr, Total_Revenue_arr, 
         hasNextPage, nextPage, prevPage, hasPrevPage, page, noOfPages, stripeTotalTransAmt, paypalTotalTransAmt, paystackTotalTransAmt, 
-        flutterTotalTransAmt, BankTransferAmt, notifications})
+        flutterTotalTransAmt, BankTransferAmt, notifications, Revenue})
 }
 
 const changeToInt = async (value, req, res) => {
@@ -205,6 +197,12 @@ const changeToInt = async (value, req, res) => {
 }   
 
 const transactSearch = async (req, res) => {
+
+    //calc sum of income, expense for alll transact and Revenue(profit)
+    let sum_income = await Income("forall")
+    let sum_expens = await  Expense("forall")
+    let Revenue = sum_income-sum_expens
+
 
     // //total amount transacted for each payment gateway (4 data)
     let stripeTotalTransAmt = await  paymentGatewayTotalTransact("Stripe")
@@ -222,7 +220,6 @@ const transactSearch = async (req, res) => {
     searchTerm = searchTerm.trim()
     // set the search value to be used for amount
     let searchValue = await changeToInt(searchTerm)
-    console.log('search: ' + searchValue)
     
     let searchTransact = Transact.find({
         $or: [
@@ -260,32 +257,10 @@ const transactSearch = async (req, res) => {
         ]
     }).count()
 
-    // if its amount
-    // if(Number(searchTerm)) {
-    //     let amountTransact = []
-    //     let amount = Transact.find({
-    //         $or: [
-    //             {Amount: searchTerm}
-    //         ]
-    //     })
-    //     amountTransact.push(amount)
-    //     let count2 = await Transact.find({
-    //         $or: [
-    //             {Amount: searchTerm}
-    //         ]
-    //     }).count()
-    //     amountTransact.forEach(tran => {
-    //         searchTransact.push(tran)
-    //     })
-    //     count = count + count2
-    //     console.log("Amount: " + amountTransact.skip(2))
-    // }
-
     // / PAGINATION
     let result = searchTransact
     const {modelinstances, hasNextPage, nextPage, prevPage, hasPrevPage, page, noOfPages} = await pagination(result,count, req, res)
     searchTransact  = await modelinstances
-    console.log(modelinstances)
 
     // for DASHBOARD
     const AllRecords = await Records.findOneAndUpdate({ID: "daily"}, {}, {upsert: true, new: true, runValidators: true})
@@ -317,7 +292,7 @@ const transactSearch = async (req, res) => {
         per_increase_decrease, current_user, monthYear_arr, 
         Total_Revenue_arr,hasNextPage, nextPage, prevPage, hasPrevPage, page, noOfPages, page_,
         stripeTotalTransAmt, paypalTotalTransAmt, paystackTotalTransAmt, 
-        flutterTotalTransAmt, BankTransferAmt, notifications,
+        flutterTotalTransAmt, BankTransferAmt, notifications, Revenue
     })
 
 
@@ -333,7 +308,6 @@ const getMonthlyTransactions = async (req, res) => {
 
     let current_user = null
     const currentUser = await User.findById(req.userId)
-    console.log(currentUser)
     if (currentUser) {
         current_user = currentUser
     }
@@ -416,11 +390,10 @@ const createTransactions = async (req, res) => {
 
             // find the just created transact with the stored ID
             const transact_ = await Transact.findOne({_id: create_ID})
-            console.log(transact_)
             
             
-            updateMonthlyRecords(transact.month_year, req, res)//update month with initial month date
-            updateMonthlyRecords(newTransact.month_year, req, res)// /update month with new month date 
+            await updateMonthlyRecords(transact.month_year, req, res)//update month with initial month date
+            await updateMonthlyRecords(newTransact.month_year, req, res)// /update month with new month date 
             
             // get the initial year of transact
             if ( transact.month_year) {
@@ -431,14 +404,13 @@ const createTransactions = async (req, res) => {
 
             //get the year of the transact updated 
             let year = newTransact.month_year 
-            console.log(year, typeof year)
             year = year.split(" ")
             year = year[1]
 
             if ( transact.month_year) {
-                updateYearlyRecords(iniyear, req, res)//only update if there was initial transact with a mont-year
+                await updateYearlyRecords(iniyear, req, res)//only update if there was initial transact with a mont-year
             }
-            updateYearlyRecords(year, req, res)
+            await updateYearlyRecords(year, req, res)
 
 
             res.redirect('/transactions')
@@ -481,7 +453,6 @@ const transactPage = async (req,res) => {
 const deleteTransactions = async (req, res) => {
 
     const transact = await Transact.findOne({ _id: req.params.id } )
-    console.log("delete: "+ transact.month_year)
     await Transact.deleteOne( { _id: req.params.id } ); 
 
     
@@ -490,7 +461,6 @@ const deleteTransactions = async (req, res) => {
     let year = transact.month_year
     year = year.split(" ")
     year = year[1]
-    console.log("year: " + year)
     await updateYearlyRecords(year, req, res)
 
     // add to the deleted transaction model
@@ -543,12 +513,12 @@ const undoDelete = async (req, res) => {
     });
     const transact_ = await Transact.create(newtransact)
 
-    updateMonthlyRecords(newtransact.month_year, req, res)//update month with initial month date
+    await updateMonthlyRecords(newtransact.month_year, req, res)//update month with initial month date
     //get the year of the transact updated 
     let year = newtransact.month_year 
     year = year.split(" ")
     year = year[1] 
-    updateYearlyRecords(year, req, res) 
+    await updateYearlyRecords(year, req, res) 
 
     res.redirect(`/deleted-transactions`)
 }
@@ -560,7 +530,6 @@ const deletedTransactionPage = async (req, res) => {
 
     let current_user = null
     const currentUser = await User.findById(req.userId)
-    console.log(currentUser)
     if (currentUser) {
         current_user = currentUser
     }
@@ -630,8 +599,7 @@ const editTransactions = async (req,res) => {
         let year = newTransact.month_year
         year = year.split(" ")
         year = year[1]
-        
-        console.log("year: " + year)
+      
         await updateYearlyRecords(iniyear, req, res)//only update if there was initial transact with a mont-year
 
         await updateYearlyRecords(year, req, res)
@@ -663,7 +631,7 @@ const editTransactions = async (req,res) => {
 const genereatePdf = async (req, res) => {
 
     const monthlyTransact = await Transact.find({month_year: req.params.month});
-    createPDF(monthlyTransact, 'transactions.pdf', req, res)
+    createPDF(monthlyTransact, 'transactions.pdf', req.params.month, req, res)
 
 }
 
@@ -671,7 +639,7 @@ const genereateExcel =  async (req, res) => {
     
     const monthlyTransact = await Transact.find({month_year: req.params.month});
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Transactions');
+    const worksheet = workbook.addWorksheet(`${req.params.month} Transaction Lists`);
 
     worksheet.columns = [
         {header: 'Company\'s Acc', key: 'companyAcc', width: 20},
@@ -692,7 +660,8 @@ const genereateExcel =  async (req, res) => {
         worksheet.addRow(tran)
     });
 
-    res.setHeader('Content-Disposition', 'attachment; filename="transactions.xlsx"');
+    const filename = `${req.params.month}_transactions.xlsx`
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
     await workbook.xlsx.write(res)

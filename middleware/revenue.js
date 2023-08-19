@@ -41,8 +41,6 @@ const getMonth_year = () => {
     const year2 = today.getFullYear()
     const formattedDate2 = `${year2}-${month2}-${day2}`
 
-    console.log("check today date if correct: " + formattedDate2)
-
     return { TodayMonthYearDay: formattedDate, TodayMonthYearDay2: formattedDate2}
 
 }
@@ -67,7 +65,6 @@ const getYesterdaydate = () => {
     const year2 = yesterday.getFullYear()
     const formattedDate2 = `${year2}-${month2}-${day2}`
     
-    console.log("check yesterday date if correct: " + formattedDate2)
     return {formattedDate, prevDay: formattedDate2}
 
 
@@ -158,7 +155,6 @@ const Income = async (forall, month_or_year) => {
         let {prevDay} = getYesterdaydate()
 
         const get_Income_tran = await Transact.find({dateofTransact: prevDay, Type:'Income'}).select('Amount')
-        console.log("previous day transact: " + get_Income_tran)
         if (get_Income_tran) {
             let incomes_Amt = []
             await get_Income_tran.forEach(tran => {
@@ -266,7 +262,6 @@ const Expense = async (forall, month_or_year) => {
         let {prevDay} = getYesterdaydate()
 
         const get_Expense_tran = await Transact.find({dateofTransact: prevDay, Type:'Expenditure'}).select('Amount')
-        console.log("prev expense transact: " + get_Expense_tran)
         if(get_Expense_tran) {
             let expens_Amt = []
             await get_Expense_tran.forEach(tran => {
@@ -299,10 +294,10 @@ const appearedMostPerMonth = async (fieldName, type1, type2, monthUpdated, req, 
     
     }
 
-    console.log("CHERTYUJHGFDERTYYTR"+ monthUpdated)
+
 
     const m_transact = await Transact.find({month_year: {$in: [currentMonth_year, monthUpdated]}, Type: {$in: [type1, type2]} })
-    console.log(m_transact)
+
 
     //count the Occurences of each name 
     const nameOccurences = {};
@@ -344,7 +339,7 @@ const calcPerc = async (ModelInstance, Model,type, id) => {
     const Expense_increase_dec_perc = (ModelInstance.expense - ModelInstance.previous_Expense) / ModelInstance.previous_Expense  * 100
     const Revenue_increase_dec_perc = (ModelInstance.revenue - ModelInstance.previous_Revenue) / ModelInstance.previous_Revenue  * 100
     
-    console.log(Income_increase_dec_perc)
+  
     let perc_Income = null
     let perc_Expense = null
     let perc_Revenue = null
@@ -372,9 +367,7 @@ const calcPerc = async (ModelInstance, Model,type, id) => {
             perincrease_revenue: perc_Revenue,
         }, {upsert:true, new: true, runValidators: true})
     }  else if (type == "month") {
-        console.log(Income_increase_dec_perc)
-        console.log(typeof Income_increase_dec_perc)
-
+        
         //check if month exist
         const check_month = await Model.findOne({month: id})
         if (check_month) {
@@ -426,7 +419,7 @@ const prevMonthRecord = async () => {
 
    const prev_month_year = previousMonth.substring(0,3) + " " + year
    // end get
-   console.log(prev_month_year)
+   
 
    //find the prev month's object
    const preMonthRecord = await Month.findOne({month: prev_month_year})
@@ -482,15 +475,14 @@ const calcPercYear = async (ModelInstance, Model,type, id) => {//id must be prev
         perc_Revenue = Revenue_increase_dec_perc.toFixed(2)
     }
 
-    console.log("ID: " + typeof id)
-    console.log(perc_Expense)
+    
     per_increase_decrease = await Model.findOneAndUpdate({year: id}, {
         perincrease_income: perc_Income, 
         perincrease_expense: perc_Expense,
         perincrease_revenue: perc_Revenue,
     }, {new: true, runValidators: true})
     
-    console.log(per_increase_decrease)
+    
     
     return per_increase_decrease
 }

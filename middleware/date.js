@@ -42,7 +42,6 @@ const updateDate = async (id, newModel, Model, res,req) => {
 // function to convert date
 const convertDate = (date) => {
 
-    console.log(date, typeof date)
     const months = [
         'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
     ]
@@ -55,7 +54,6 @@ const convertDate = (date) => {
     const month_ = month.substring(0,3)
 
     const month_year = month_ + " " + year
-    console.log("Month: " + month_year)
 
     const month_year_day = month_ + " " + day + " " + year
     //return after conversion
@@ -81,10 +79,10 @@ const createDate = async (newModel, Model) => {
     let {month_year} = await convertDate(dateofTransact)
 
 
-    console.log(newModel._id)
+
         
     const transact1 = await Model.findOneAndUpdate({_id: newModel._id}, {createAt: create, month_year: month_year}, {new: true, runValidators:true})
-    console.log(transact1)
+
 
     return transact1
 

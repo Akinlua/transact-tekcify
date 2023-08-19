@@ -65,7 +65,6 @@ const postLogin = async (req, res) => {
     const password = req.body.password
 
     const user = await User.findOne({username})
-    console.log(username, password)
 
     let error = ""
     if(!user) {
@@ -114,7 +113,6 @@ const forgotPassword = async (req, res) => {
 
     //generate a unique reset token
     const resetToken = generateToken(10)
-    console.log(resetToken)
     // could create a expiration time
 
     user.resetToken = resetToken
@@ -156,9 +154,8 @@ const resetPassword = async (req, res) => {
         return res.render("errors/error-500", {layout: noLayout, name: "Not Found",statusCode: 404, message: "No user found"})
 
     }
-    console.log(token, newPassword)
+    
     const user = await User.findOne({resetToken: token})
-    console.log(user)
     if (!user) {
         return res.render("errors/error-500", {layout: noLayout, name: "Not Found",statusCode: 404, message: "No user found"})
     }

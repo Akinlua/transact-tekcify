@@ -5,7 +5,7 @@ const pagination = async (result, count, req, res ) => {
     let page =Number(req.query.page) || 1
     let limit = Number(req.query.limit) || 10
 
-    console.log("REQ: " + req.query.page)
+   
     // check for limit
     if(req.query.limit <= 0)
         limit = 5
