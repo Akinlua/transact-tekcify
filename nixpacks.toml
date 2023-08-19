@@ -1,2 +1,4 @@
 [phases.setup]
-aptPkgs = ["...", "libuuid1"]
+aptpkgs = ["e2fsprogs"]
+nixPkgs = ["util-linux"]
+providers = ["...", "node"]
